@@ -1,0 +1,277 @@
+---
+title: "Problem Set - 2"
+author: "Aravind K Mannarswamy"
+date: "November 11, 2020"
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 4
+    fig_width: 6
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+
+---
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+library(DT)
+library(knitr)
+library(FinancialMath)
+```
+
+# Utility and cot of insurance    
+   
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+i = seq(2000,12000)
+u = i^0.5
+df = data.frame(income = i, utility = u)
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+df %>% 
+  ggplot()+
+  aes(x = income, y = utility)+
+  geom_line()+
+  geom_hline(yintercept = 90, linetype = "dashed", color = "red")+
+  geom_vline(xintercept = c(2500, 8100,8500, 10000), linetype = "dashed", color = "red")+
+  annotate(geom = "segment",x = 2500,y = 50,xend = 10000,yend = 100,linetype = "dashed", color = "blue")+
+  annotate(geom = "segment",x = 8500,y = 90,xend = 10000,yend = 90,color = "darkgreen", arrow = arrow(ends = "both"))+
+  annotate(geom = "text",x = 9300,y = 87,label ="risk Premium",color = "darkgreen", arrow = arrow(ends = "both"))+
+  scale_y_continuous(limits = c(45,105))+
+  scale_x_continuous(breaks = c(2500, 8100, 8500, 10000))+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.4))+
+  xlab("Income")+
+  ylab("Utility")
+```
+
+## Expected Value of income without insurance    
+
+E(I) = $p_s.I_s + p_h.I_h$    
+    
+E(I) = 0.2 * 2500 + 0.8 * 10000 = 8500   
+    
+
+## Expected utility without insurance    
+
+E(U) = $p_s.U_s + p_h.U_h$  
+
+E(U) = $p_s.I_s^{0.5} + p_h.I_h^{0.5}$      
+
+
+## fair premium    
+
+At an actuarially fair premium, there is no profit to either of the parties involved, or simply   
+
+$r = pq$    
+
+Since the possible loss amount 10000 - 2500 = 7500 has a 0.2 chance of happening,  
+
+$r = 0.2 * 7500$    
+
+$r = 1500$    
+
+$I_h^` = 10000 - 1500 = 8500$   
+
+which is also   
+
+$I_s^` = 2500 - 1500 + 7500 = 8500$     
+
+## Certainty equivalent   
+
+Since the expected utility is 90, a certainty income of 8100 will satisfy this condition. This basically means that making 8100 with no risk has the same utility as making expected income of 8500.   
+
+## Risk premium    
+
+Risk premium is the difference between the maximum pay scenario and the expected income. The risk premium in this case is \$1500.   
+
+## Maximum insurance cost   
+
+For a full insurance, the fair cost of premium is 1500. This will be the maximum insurance premium that can be charged. The minimum could be just a over *zero* as long as it satisfies the conditions $r = pq$ and $q < I_H - I_S$.      
+
+
+# r = 100 and q = 500   
+
+## Peters situation   
+
+$I_H = 500$   
+$I_S = 0$  
+$p = 0.1$   
+
+$pq = 0.1 * 500 = 50$ which is less than the premium `r`. Hence the contract is unfair.   
+
+## Tims situation   
+
+$I_H = 500$   
+$I_S = 0$  
+$p = 0.2$    
+
+$pq = 0.2 * 500 = 100$ which is equal to the premium `r`. Hence the contract is fair.   
+$I_H - I_S = 500 - 0 = 500$ which is equal to the payout `q`. Hence the contract is full.   
+
+If Tim doesnt buy the contract, his expected income is 0.2 * 0 + 0.8 * 500 = 400. If he purchases the contract, his expected income will be 0.8 * 500 + 0.2 * 500 - 100 = 400. So by buying a contract, he is not changing his income levels, however, he is moving from uncertain to certain in making that $400.   
+
+
+## Jay's situation   
+
+$I_H = 1000$   
+$I_S = 0$  
+$p = 0.2$    
+
+$pq = 0.2 * 500 = 100$ which is equal to the premium `r`. Hence the contract is fair.   
+$I_H - I_S = 1000 - 0 = 1000$ which is greater than the payout `q`. Hence the contract is partial.   
+
+## Ronald's situation   
+
+Unfair and partial contracts will have the following characteristics:   
+
+$r > pq$
+$q < I_H - I_S$   
+
+For the first condition, $ p < r/q = 100/500 = 0.2$. So the probability of falling sick resorting to sick income level should be less than 0.2   
+
+For the second condition, $q < I_H - I_S$. So for any healthy state income that is more than 500 and difference between
+the healthy state and the sick state is greater than 500, the contract will be partial.    
+
+## More of Ronald's situation   
+
+$I_S = 200$    
+
+Based on the previous section, the minimum value of $I_H > 200$ and the value of $p < 0.2$. However, between $I_H = 200$ & $I_H= 700$, adverse selection should occur. So a minimum $I_H>700$ is desirable.     
+
+### Quick check   
+
+Lets assume case-1 as follows   
+
+
+$I_H = 700$   
+$I_S = 200$  
+$p = 0.2$    
+
+$pq = 0.2 * 500 = 100$ which is equal to the premium `r`. Hence the contract is fair.   
+$I_H - I_S = 700 - 200 = 500$ which is equal to the payout `q`. Hence the contract is full.    
+
+
+Lets assume case-2 as follows   
+
+
+$I_H = 500$   
+$I_S = 200$  
+$p = 0.2$    
+
+$pq = 0.2 * 500 = 100$ which is equal to the premium `r`. Hence the contract is fair.   
+$I_H - I_S = 500 - 200 = 300$ which is less than the payout `q` and hence it is not a meaningful contract.
+
+
+
+Lets assume case-3 as follows   
+
+
+$I_H = 700$   
+$I_S = 200$  
+$p = 0.1$    
+
+$pq = 0.1 * 500 = 50$ which is less than the premium `r`. Hence the contract is unfair.   
+
+So the ideal situation for Ronald is $I_H \ge 700$ and $p \le 0.2$   
+
+## True or False    
+
+True, because his contract is fair and full. So his expected income with and without insurance remains the same, but with insurance, he is assuming no risk or in other words, moves to a certainty condition.      
+
+# Ellen's doctor visit   
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+Q = seq(0,30)
+P = 30 - Q
+df2 = data.frame(price = P, quantity = Q)
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+df2 %>% 
+  ggplot()+
+  aes(x = quantity, y = price)+
+  geom_line()+
+  annotate(geom = "segment",x = 30,y = 30,xend = 30,yend = 0,color = "darkgreen", size = 1)+
+  annotate(geom = "segment",x = 0,y = 20,xend = 30,yend = 20,color = "darkgreen", linetype = "dashed",size = 0.5)+
+  annotate(geom = "segment",x = 30,y = 20,xend = 10,yend = 20,color = "darkgreen", size = 2.5)+
+  annotate(geom = "segment",x = 10,y = 20,xend = 30,yend = 0,color = "darkgreen", size = 2.5)+
+  annotate(geom = "segment",x = 30,y = 20,xend = 30,yend = 0,color = "darkgreen", size = 2.5)+
+  annotate(geom = "text",x = 25,y = 15,label ="Dead Weight Loss",color = "darkgreen")+
+  theme_bw()+
+  xlab("Quantity of Hospital Visits")+
+  ylab("Price")
+```
+
+## How many visits   
+
+Q = 30 - P = 30 - 20 = 10    
+
+## Full insurance   
+
+Q = 30 - 0(insurance pays it all) = 30 visits    
+
+## Dead weight loss   
+
+Given in chart    
+
+## Size of the dead weight loss   
+
+The size of the deadweight loss is the area of the triangle. 0.5 * (30-10)*(20-0) = 200   
+
+## 50% coinsurance   
+
+With 50% coinsurance, she will pay \$10 per visit. Hence there will be a total of 30 - 10 = 20 visits per year.   
+
+## Deadweight loss from a 50% coinsurance    
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+df2 %>% 
+  ggplot()+
+  aes(x = quantity, y = price)+
+  geom_line()+
+  annotate(geom = "segment",x = 15,y = 30,xend = 30,yend = 0,color = "darkgreen", size = 1)+
+  annotate(geom = "segment",x = 0,y = 20,xend = 30,yend = 20,color = "darkgreen", linetype = "dashed",size = 0.5)+
+  annotate(geom = "segment",x = 0,y = 10,xend = 30,yend = 10,color = "darkgreen", linetype = "dashed",size = 0.5)+
+  annotate(geom = "segment",x = 20,y = 20,xend = 10,yend = 20,color = "darkgreen", size = 2.5)+
+  annotate(geom = "segment",x = 10,y = 20,xend = 20,yend = 10,color = "darkgreen", size = 2.5)+
+  annotate(geom = "segment",x = 20,y = 20,xend = 20,yend = 10,color = "darkgreen", size = 2.5)+
+  annotate(geom = "text",x = 16,y = 18,label ="Dead Weight Loss",color = "darkgreen")+
+  theme_bw()+
+  xlab("Quantity of Hospital Visits")+
+  ylab("Price")
+```
+
+With 50% coinsurance, the new demand curve(from 100% insurance) moves counter clockwise by 50% in value and the deadweight loss is 0.5 * (20-10) * (20-10) = 50. The deadweight loss decreased from 200 square units to about 50 square units with coinsurance. The reason why it is not 50% is because of the *marginal benefit*. The 21st visit is not as valuable as the 20th visit and so on. Hence the visits 10-20 are valued much more than the visits from 20 - 30.   
+
+# Moral Hazard   
+
+## Is there moral hazard?   
+
+Yes, there is moral hazard in this market. For the history professors, the average expenses with insurance is about \$3000 while without insurance, it is about 33.3% less or \$2000.    
+
+## Is there adverse selection?   
+
+Yes, due to the introduction of \$4000 premium, history professors who spend about \$3000 per year dropped out while the Economic professors who spend about \$5000, kept their insurances. By altering the premium cost, ASU discouraged certain group of players to buy the insurance.   
+
+## Interaction of Moral Hazard and Adverse Selection   
+
+### This is facilitaed by two folds: The moral hazard exhibited by the history professors can be seen in the decrease between with and without insurance costs while adverse selection effect manifested by the increase in premium over what the history professors would have spent if they would have had insurance. The economics professors who spend 5000 didnt drop out(or at least as given didnt drop out like the history professors!).    
+
+## Critical information    
+
+If the cost of history professors healthcare costs without the health insurance information is unknown, then it will be difficult to establish the presence of moral hazard and adverse selection.     
+
+
+
+

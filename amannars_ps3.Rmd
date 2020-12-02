@@ -1,0 +1,194 @@
+---
+title: "Problem Set - 3"
+author: "Aravind K Mannarswamy"
+date: "November 18, 2020"
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 4
+    fig_width: 6
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+
+---
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+library(DT)
+library(knitr)
+```
+
+
+# PPF in the Grossman model   
+
+
+## Why is the graph shaped the way it is between A and B    
+
+1. At point A, the individual is at minimum health and with no productive time available, the consumer cannot afford any home good Z.     
+2. However, the healthier the individual gets, the consumer gets more productive time and therefore more home good Z.     
+3. At point B, the consumer has reached an optimal point between the health and home good. The consumer cannot improve on health without sacrificing home good.     
+
+To accomodate the above characteristic, a concave down curve like between A and B works best.   
+
+## Why is the graph shaped the way it is between B and C   
+
+1. Between B and C, as the consumer spends more time to be healthy beyond the optimal point B, the consumer has to sacrifice home good Z.     
+2. To accomodate this behavior, the portion between B and C is shaped the way it is. Also, when the person is at C, the consumer has no time for home good Z.     
+
+## Should a consumer pick a point between A and B   
+
+1. A consumer with typical preferences should not pick between A and B.  
+2. The reason is the consumer stands to gain both health and home good as they move from A to B and therefore should stay at B.    
+
+
+# MEC  
+
+
+
+
+## Why does it slope downwards   
+
+1. The marginal efficiency of capital slopes downwards because marginal lifetime returns to health are high at very low levels and it diminishes as the levels of health increase.  
+
+2. At high levels, the cost of making that investment may be so high that it cannot be justified and hence it approaches to almost zero marginal efficiency.   
+
+## Two things that contribute to the costs of health capital   
+
+1. The opportunity cost that the individual has to forego from other investment options to invest in health. If these alternate investments would have returned an interest rate 'r', then 'r' is the opportunity cost factor.   
+2. The depreciation due to aging $\gamma$ is the second type of cost to investing in health.  
+3. Combining these two costs, the market rate of return compared to an alternate investment plus depreciation($r + \gamma$) is the cost of investing in health capital.   
+
+## Effect of aging  
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Effects of aging on health", fig.height=3, fig.width=5}
+x = seq(2,10)
+y = 4 - x^0.5
+df = data.frame(MEC1 = x, y = y, MEC2 = x + 2) %>% 
+  pivot_longer(cols = c(MEC1,MEC2),
+               values_to = "Health",
+               names_to = "MEC")
+
+df %>% 
+  filter(MEC == 'MEC1') %>% 
+  ggplot()+
+  aes(x = Health, y = y, color = MEC)+
+  geom_line()+
+  theme_bw()+
+  scale_x_continuous(limits = c(0,12))+
+  scale_y_continuous(limits = c(0,3))+
+  xlab("Health")+
+  ylab("Rate of Return")+
+  theme(axis.text = element_blank())+
+  annotate(geom = "segment",x = 0,y = 2.5,xend = 2.2,yend = 2.5, linetype = "dashed", color = "blue")+
+  annotate(geom = "segment",x = 2.2,y = 0,xend = 2.2,yend = 2.5, linetype = "dashed", color = "blue")+
+  annotate(geom = "segment",x = 4,y = 2,xend = 4,yend = 0, linetype = "dashed", color = "blue")+
+  annotate(geom = "segment",x = 0,y = 2,xend = 4,yend = 2, linetype = "dashed", color = "blue")+
+  annotate(geom = "segment",x = 6.25,y = 1.5,xend = 6.25,yend = 0, linetype = "dashed", color = "blue")+
+  annotate(geom = "segment",x = 0,y = 1.5,xend = 6.25,yend = 1.5, linetype = "dashed", color = "blue")+
+  annotate(geom = "text",x = c(0,0,0),y = c(1.6,2.1,2.6),label = c("A","B","C"))
+```
+
+
+Based on the text book(refer to Figure-1), *As the individual ages, the depreciation of health increases from $\gamma_0$(point-A) to $\gamma_1$(point-B) and finally to $\gamma_{min}(point-C)$. Such a high depreciation level means any investments in health decay immediately, so the individual may not want to invest in health at all.*   
+Simply, as one ages, the depreciation of health is so rapid that any investment towards health as one ages will start to make it more and more expensive with decreasing returns.   
+
+## Effect of a job   
+  
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Effect of getting a job shifts the MEC to the right", fig.height=3, fig.width=5}
+x = seq(2,10)
+y = 4 - x^0.5
+df = data.frame(MEC1 = x, y = y, MEC2 = x + 2) %>% 
+  pivot_longer(cols = c(MEC1,MEC2),
+               values_to = "Health",
+               names_to = "MEC")
+
+df %>% 
+  ggplot()+
+  aes(x = Health, y = y, color = MEC)+
+  geom_line()+
+  theme_bw()+
+  scale_x_continuous(limits = c(0,12))+
+  scale_y_continuous(limits = c(0,3))+
+  xlab("Health")+
+  ylab("Rate of Return")+
+  theme(axis.text = element_blank())+
+  annotate(geom = "segment",x = 0,y = 2,xend = 6,yend = 2, linetype = "dashed", color = "blue")+
+  annotate(geom = "segment",x = 4,y = 2,xend = 4,yend = 0, linetype = "dashed", color = "blue")+
+  annotate(geom = "segment",x = 6,y = 2,xend = 6,yend = 0, linetype = "dashed", color = "blue")+
+  annotate(geom = "text",x = c(4,6),y = c(2.1,2.1),label = c("H1*","H2*"))
+  
+```
+
+
+1. The desired level of health increases   
+2. According to the model, as one gets higher wages and safer environment, they get easier acces to better healthcare and minimize external factors that pose risk.  
+3. As a result, they become efficient producers of health than the state before.  
+4. In Figure-2, movement from $H_1^*$ to $H_2^*$ denotes this shift.   
+
+# SEC - Rich Edwards et al.(2005)   
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+weight_levels1 = c("average","low","very-low","extremely-low")
+disease = c("Coronary Heart Disease","Stroke","All Cardiovascular Disease")
+risk_percent = c(100,130,148,131,100,116,105,123,100,123,129,127)
+df3 = expand.grid(weight_levels = weight_levels1, disease = disease,stringsAsFactors = FALSE,KEEP.OUT.ATTRS = FALSE) %>% 
+  mutate(risk_percent = risk_percent,
+         weight_levels = factor(x = weight_levels,levels = weight_levels1,ordered = TRUE))
+
+```
+
+## Is it a coincidence   
+
+No it is not. It is by design that the average group(which technically is a control group) is equated to 100%. This gives a nice baseline to compare the other groups against this group.    
+
+## Summarize the data in a figure   
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Impactof birthweight - as a factor"}
+df3 %>% 
+  ggplot()+
+  aes(x = weight_levels, y = risk_percent, color = disease, group = disease)+
+  geom_point()+
+  geom_line()+
+  theme_bw()+
+  xlab("Birth Weight Group")+
+  ylab("Relative Risk(100% is the average birthweight cohort)")
+
+```
+
+Based on the given data, birthweight is at least a *'preliminary'* predictor of an individuals chances for the aforementioned diseases. In general, the lower the birth weight than the average, the higher the risk(or hazard rate) in developing coronary heart disease, stroke or total cardiovascular disease.   
+
+## Thrifty phenotype hypothesis   
+
+1. The *thrifty phenotype hypothesis* posits that to some degree, the health outcomes through out the life is somewhat predetermined as it occurs very early in the childhood, sometimes as early as even in the womb.   
+2. Accordingly, children from poorer families are likely to suffer more deprivation during gestation and infancy leading to low level of health   
+3. The data shown above shows just that and justifiably so. For example, poorer SEC mothers are likely to smoke or do drugs during pregnancy that impacts the health of the unborn. These are often permanent damages that the kid will have to live with through out.   
+
+
+# Health of higher SEC group to lower SEC group   
+
+## Self reported health status   
+
+1. Everyone can answer this question and the data analysis shouldnt have to worry about bias in the data collection process.   
+2. The disadvantage with this measure is that it is subjective in nature. There is no numerical scale and so a score of 8 may be a score of 5 for someone. With such measures, objective comparisons become challenging    
+3. In general, wealthier individuals report better health according to NHIS data from US.  
+   
+## Days of sick leave from work   
+
+1. It depends on whether someone has health insurance and also the type of coverage. People with health insurance may be able to take a sick leave but for someone without the coverage, they will be forced to work even if they are sick.     
+2. Due to this possible correlation between the people who have health insurance and their SES, it may be difficult to compare the health status of higher-income group to the lower-income grou using this information.    
+   
+## Number of times visiting the doctor   
+
+1. This also depends on whether someone has health insurance.  
+2. There is the possibility of direct correlation between the quality of health insurance and the number of hospital visits. For insurances with no copayments to coinsurance to full coverage, all of this may be a factor for the number of hospital visits.   
+3. So this may not be good measure to compare the health levels of the two groups.   
+
+## Number of times going to the emergency room   
+
+1. Emergency room visits arise out of the urgent necessity and therefore it will be a good measure to compare the health levels between the two groups.   
+2. The emergency room visits should be, at least to some degree independent of other external factors.   
+
+

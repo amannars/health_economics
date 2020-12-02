@@ -1,0 +1,297 @@
+---
+title: "Policy Summary - 1"
+author: "Aravind K Mannarswamy"
+date: "November 04, 2020"
+output:
+  pdf_document:
+    fig_caption: yes
+    fig_height: 3.2
+    fig_width: 4
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+
+---
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(magrittr)
+library(DT)
+library(knitr)
+library(FinancialMath)
+library(openxlsx)
+library(scales)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+heart_attack_df = read.xlsx(xlsxFile = "./heart_attacks.xlsx")
+
+el_paso_df = heart_attack_df %>% 
+  filter(market == 'TX - El Paso')
+
+```
+
+# Name of the market     
+
+I am choosing TX - El Paso market. El Paso is the part of Texas that has more in common with its surrounding state NM and culturally its neighboring country, Mexico. This market comprises of Las Cruces - NM, Alomogordo - NM and El Paso - TX.    
+
+# Average Price   
+
+Here is a quick summary of the eight hospitals in the El Paso, TX market:   
+   
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+summary(el_paso_df$average_payment)
+```
+
+   
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+el_paso_df %>% 
+  ggplot()+
+  aes(y = average_payment, x = 0, labels = average_payment)+
+  geom_point()+
+  geom_boxplot(alpha = 0.5)+
+  annotate(geom = "text",
+           x = 0.05, 
+           y = el_paso_df$average_payment, 
+           label = round(el_paso_df$average_payment,0), 
+           color = el_paso_df$average_payment)+
+  theme_bw()+
+  theme(axis.text.x = element_blank())+
+  ggtitle(label = "Boxplot of average payments for heart attack case cost",subtitle = "TX - El Paso market")
+```
+
+The ratio of the highest average price and the lowest average price is about 1.65(=14162/8568). This information, combined with the boxplot suggest that price can be as high as 165% of the lowest possible average cost in the market. So this may not be a very competitive market. However, we should also note with caution that the highest charging place had only about 20 cases. So comparing these numbers to a weighted average might be best.        
+
+# Descriptive Summary of the market    
+
+   
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+el_paso_df %>% 
+  select(hospital_name, city, number_of_patients, average_payment) %>% 
+  kable()
+  
+
+```
+
+
+There are a total of 8 hospitals in the market.    
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4}
+weighted_average = sum(el_paso_df$number_of_patients * el_paso_df$average_payment)/sum(el_paso_df$number_of_patients)
+el_paso_df %>% 
+  select(hospital_name, city, number_of_patients, average_payment) %>% 
+  ggplot()+
+  aes(x = number_of_patients,y = average_payment, color = city, size = number_of_patients)+
+  geom_point()+
+  theme_bw()+
+  ggtitle(label = "Understanding Average Cost",subtitle = "Market: TX - El Paso")+
+  xlab("Number of patients")+
+  ylab("Average Payment")+
+  geom_hline(yintercept = weighted_average, color = "red", linetype = "dashed")+
+  annotate(geom = "text",label = "Weighted Average Cost Line",x = 100, y = weighted_average+150)+
+  scale_y_continuous(labels = comma_format(prefix = "$"))
+
+```
+
+To get the average cost, it is best to use the weighted average instead of the simple average because the number of patients treated by each of these hospitals are different. The weighted average is about \$10087 per patient. This aligns closely with the hospital that treats the most patients as can be seen in the chart titled `Understanding Average Cost`
+
+
+# Economies of scale   
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=4}
+
+el_paso_df %>% 
+  select(hospital_name, city, number_of_patients, average_payment) %>% 
+  ggplot()+
+  aes(x = number_of_patients,y = average_payment)+
+  geom_point()+
+  theme_bw()+
+  ggtitle(label = "Understanding Average Cost for TX - El Paso market",
+          subtitle = "Blue line -linear fit; Red Line: Average Cost; Grey Area: Standard Error of prediction")+
+  xlab("Number of patients")+
+  ylab("Average Payment")+
+  geom_smooth(method = "lm")+
+  geom_hline(yintercept = weighted_average, color = "red", linetype = "dashed")+
+  annotate(geom = "text",label = "Weighted Average Cost Line",x = 100, y = weighted_average+150)
+
+```
+
+## Economies of scale expectation    
+
+As the number of patients treated increases, I would expect the average cost to go down. That is because some of the costs are fixed and so even if the variables costs changed, the fixed cost contribution to the total cost should decrease with every additional patient.    
+
+
+## Does the economies of scale expectation hold good?   
+
+Yes, it does. Though it is not a very strong linear fit, directionally it is what I would have expected to see. 
+
+
+# Do the hospitals compete in the market    
+
+## Relationship between number of hospitals and the average price for heart attack treatment    
+
+1. The expected relationship between the number of hospitals and the average price for the heart attack should be inversely correlated, should there exist competition within market but not between markets.   
+2. If on the other hand, if such a relationshop is random(or the slope is equal to zero, or statistically insignificant from zero), that would imply, competition exists not just within markets but also between markets.   
+
+
+## Cost by market size from the dataset    
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+
+market_summary_df = heart_attack_df %>%
+  mutate(patient_times_cost = average_payment * number_of_patients) %>% 
+  group_by(market) %>% 
+  summarise(total_patients = sum(number_of_patients),
+            number_of_hospitals = mean(hospitals_in_market),
+            total_cost = sum(patient_times_cost)) %>% 
+  ungroup() %>% 
+  mutate(average_price = total_cost/total_patients)
+
+market_summary_df %>% 
+  head() %>% 
+  kable(caption = "Sample of data used for market analysis")
+```
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+
+market_summary_df %>% 
+  ggplot()+
+  aes(x = number_of_hospitals,y = average_price, size = total_patients)+
+  geom_jitter(width = 0.1, alpha = 0.2)+
+  theme_bw()+
+  geom_hline(yintercept = 10238,color = "red", linetype = "dashed")+
+  geom_vline(xintercept = 5.5, color = "red", linetype = "dashed")+
+  annotate(geom = "point", x = 5.5, y = 10238, color = "red", size = 5)+
+  annotate(geom = "point", x = 8, y = weighted_average, color = "blue", size = 5)+
+  geom_smooth(method = "lm")+
+  ggtitle(label = "Understanding market competition",subtitle = "Red dot: Market average in the dataset; Blue dot: Market average for the selected market")+
+  xlab("Number of Hospitals")+
+  ylab("Average price for heart attack treatment")
+
+
+```
+
+1. In the scatter plot for all the markets together, I expected a linear model to have a negative slope, that is decrease in the average price as the number of hospitals increase. However, that is not the observed trend. That being the case, the average value 5.5 hospitals and \$10,238 average cost, is contained within the standard error(shaded grey area) of all the markets with hospital sizes between 3 and 10. This suggests, that the market at large is very competitive.    
+
+
+# Factors affecting the price differences    
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+el_paso_df$entity_type = c('for_profit','non_profit','for_profit','for_profit','for_profit','for_profit','non_profit','for_profit')
+
+el_paso_df %<>% 
+  mutate(pop_2018 = ifelse(city == "ALAMOGORDO",
+                           31701,
+                           ifelse(city == "EL PASO",
+                                  682669,
+                                  102926)))
+
+
+```
+
+## Background information for discussion    
+
+1. Of these 8 hospitals, three of them in El Paso, namely Sierra Medical center, The hospitals of providence memorial campus and the Sierra providence east medical center, belong to one umbrella group of hospitals known as the 'Hospitals of Providence' and they primarily serve El Paso and its surroundings.   
+
+2. Two of these hospitals, Gerald champion and University medical center at El Paso are listed as non-profit organizations, while others are either for profit or not listed. I have assumed all these to be for-profity organizations due to its structure.   
+
+3. They serve, three areas near and including El Paso. Two of them are in New Mexico, Alomogordo and Las Cruces but for practical purposes, we can consider them to be made up identical demographics, predominantly hispanic population. Given this information, I am assuming that this market is representative of New Mexico state as a whole. Based on data.census.gov data, about 90% of the states population is insured.   
+
+## Discussion relevant to price differences    
+
+### Are non-profits cheaper?   
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5,fig.cap="Analysing cost by hospital type"}
+el_paso_df %>% 
+  ggplot()+
+  aes(x = entity_type, y = average_payment)+
+  geom_boxplot()+
+  theme_bw()+
+  xlab("Hospital Type")+
+  ylab("Average Price for Heart Attack Treatment")+
+  ggtitle("Type of Hospital vs Price")+
+  scale_y_continuous(labels = comma_format(prefix = "$"))
+
+
+```
+
+1. It appears that the non-profit hospitals appear to be expensive than the for profit hospitals, and they served a total of 69 patients in this data subset. There are two hospitals in this group(non-profit), one of them is part of a university medical school while the other is a military based community hospital. The lower number of patients compared to the for-profit group, which has served about 605 patients. This discrepancy in the number of people served may potentially explain the price differences in treatment.        
+
+2. There could also be another reason as to why the cost could be higher in the non-profit hospitals. The medical school based hospitals may be charging for their research and may even add the costs to cover the uninsured patients to the insured. A private hospital may not necessarily bear this expense and may refer such patients to non-profit organizations, which may be the reason for their lower costs.   
+
+## Is it also based on the sub-market size    
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=3,fig.cap="Market Subsize"}
+
+el_paso_df %>% 
+  select(city, pop_2018) %>% 
+  distinct() %>% 
+  ggplot()+
+  aes(x = city, y = 1, size = pop_2018, color = city)+
+  geom_point()+
+  theme_bw()+
+  theme(axis.text.y = element_blank())+
+  scale_y_continuous(limits = c(0.9,1.1))+
+  ggtitle(label = "Submarket size",subtitle = "Size of the bubble is the population in 2018")
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=5,fig.cap="Market Size Vs Price"}
+el_paso_df %>% 
+  ggplot()+
+  aes(x = city, y = average_payment)+
+  geom_boxplot()+
+  theme_bw()+
+  xlab("City(sub market)")+
+  ylab("Average Price for Heart Attack Treatment")+
+  ggtitle("Submarket vs Price")+
+  scale_y_continuous(labels = comma_format(prefix = "$"))
+
+
+```
+
+1. The non-profit is located in the smallest sub-market in Alamogordo and so it is difficult to separate the impact of sub market size. However, El Paso and Las Cruces have similar prices, suggesting that the competition could be driving the costs to attain a market equilibrium price.   
+
+
+## Effect of distance between the cities    
+
+![Distance between the three submarkets](distance_between_cities.PNG)
+
+1. EL Paso and Las Cruces are separated by a mere hour while Alomogordo is separated from both these cities by at least 3 hours. So the higher price in Alomogordo could also be the result of distance between its nearest submarket. It may also be a reason that the community may be underserved and that the physicians may demand more to work there compared to the two bigger cities.   
+
+
+## Price Differences - Closing Comments:   
+
+1. Non-profit hospitals charged more in this market of 8 hospitals, regardless of the city.      
+2. Bigger cities, tend to offer competitive or better prices for the same healthcare service.   
+3. If a hospital is located at an isolated or far away location from its nearest hospitals in the same market, they could be priced higher  
+
+
+
+# Price data on knee replacements    
+
+## Should we see the same pattern    
+
+Yes, we should likely see the same pattern. The three factors that were highlighted in this policy summary does not take into account the type of procedure but rather the other factors such as market size, competition and the distance to its nearest competitive hospital. For that reason, we should expect the costs to follow similar trend as the heart attack pricing.   
+
+There could, however be exceptions. For example, one of these hospitals may explicitly say that they do not offer knee replacement procedures. That is however not the case in this particular instance because all of their websites advertise that they do in fact do knee replacement surgeries.    
+
+
+# References:    
+
+1. maps.google.com   
+2. https://en.wikipedia.org/wiki/Gerald_Champion_Regional_Medical_Center   
+3. https://en.wikipedia.org/wiki/University_Medical_Center_of_El_Paso    
+4. https://www.thehospitalsofprovidence.com/about    
+5. https://www.mmclc.org/   
+6. https://laspalmasdelsolhealthcare.com/connect-with-us/about/   
+7. https://www2.census.gov/programs-surveys/demo/tables/health-insurance/time-series/acs/hic09_acs.xls   
+8. https://www.mountainviewregional.com/   
+9. Jay Bhattacharya et al, "Health Economics", McMillan International higher education, 2014.   
+
