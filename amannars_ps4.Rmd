@@ -35,7 +35,7 @@ Alternatively, 500/(0.05*0.002) = \$5,000,000.
 ## Re-do the survey   
   
 ### VSL estimates of people who have already had a heart attack    
-Suppose we want to estimate the cost of treatment that could potentially save someone from heart attack who is already at high risk of dying from it should use this approach.Another hypothetical example could be to determine the cost of treatment to reverse type-2 diabetes.  
+Suppose we want to estimate the cost of treatment for someone who already had a heart attack to save from dying, VSL estimates of people who may already have a heart attack would be the apprpriate choice. Another hypothetical example for using VSL estimates from affected population could be to determine the cost of treatment to reverse type-2 diabetes.  
 
 
 ### VSL estimates of entire population   
@@ -65,10 +65,117 @@ df2 %>%
 1. All the three groups have different baselines for their 'subjective' evaluation of the quality life.   
 2. People who have lived with blindness for 20 years may have already accustomed to being blind as their baseline and insteadwill focus on health ailments to determine their quality of life. In contrast, people who recently became blind has their baseline set at being sighted. This difference in where they were 'recently' must have affected their decision to rate as such.   
    
-## Appropriate approach for a possible side effect   
-Using q = 0.4, that is the people who are sighted should be the right number to be used. The reason is that the side effect of the drug is becoming blind, that calls for the assumption that someone who can see could potentially become blind due to the use of the drug.   
+## Appropriate approach for a possible side effect  
+  
+1. Using q = 0.4, that is the people who are sighted should be the right number to be used. The reason is that the side effect of the drug is becoming blind, that calls for the assumption that someone who can see could potentially become blind due to the use of the drug.   
+
+2. However, if the treatment is applicable for all regardless of whether the person is blind to begin with, then a weighted average quality of life should be used.   
+   
+3. If one has to be conservative in approach, the people who have recently lost sight should be a good measure and so use q = 0.1  
    
 ## Appropriate approach for restoring sight to the blind   
 Using either q = 0.1 or using q = 0.9, depending on the patient should be fair. However, a weighted average of these responses should be the right approach. For example, if the survey had `n1` long time blind and `n2` recently became blind people, then the appropriate weighted measure would be $(0.9 n_1 + 0.1n_2)/(n_1 + n_2)$      
+   
+   
+# Health Policy Conundrum   
 
+## Purely private insurance
+
+Health systems focused on promoting equity typically have purely private insurance markets: **FALSE**. Private insurance setting may result in maximal adverse selection and many people cannot buy health insurance. So it will be difficult to achieve equity.  
+
+## Insurance mandate  
+  
+Insurance mandates do little to combat the problem of adverse selection: **FALSE**. One of the primary reasons for the insurance mandate is to infact combat adverse selection by effectively banning it.   
+
+## Cost sharing
+   
+Cost-sharing in insurance plans is used to combat moral hazard at the expense of equity: **TRUE**. Because the cost charing brings the demand curve somewhere in between no insurance to full insurance. Since in full insurance, the moral hazard will be at its maximum, cost sharing plans like co-payment and co-insurance plans reduce the moral hazard from a full insurance. There However, they may not be able to completely remove the moral hazard compared to no insurance case. The cost or the tradeoff of this expense is the cost of equity or in achieving fairness because now there is a out of pocket cost involved and could lead to somewhat diminished health care access to the poor.     
+
+
+
+
+# Second Hand Smoke   
+
+
+## Private cost and benefit for Jay   
+Jay was willing to pay up to \$8 a pack, and ignore the health costs of \$6 per pack. So his benefit he is expected to be \$14. The total cost per pack would be the sum of \$6 in cost and \$6 in health damage. Hence Jay's private cost is \$12 while his benefit is \$14. So it is efficient for Jay to purchase at any price less than or equal to \$8.        
+    
+    
+## Public cost and benefit  
+
+The public benefit would be the same as \$8 if we assume everyone thinks like Jay but the public cost now would include an additional \$5 for the health damage due to the 2nd hand smoke.  Now the total cost to public is about \$19 and hence it is inefficient now when the effects due to second hand smoking is also included.   
+
+## $1 a pack   
+
+Since the market is perfectly competitive, the cost of a pack of cigarettes would be \$1 per pack which will bring his total private cost to about \$7(1+6). It would again not be socially effective because of the two separate supply curves. 
+   
+   
+# Second hand smoke - continued  
+  
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="the green triangle represents the social loss"}
+df4 = data.frame(Q = seq(0,100)) %>% 
+  mutate(P = 100 - Q)
+
+df4 %>% 
+  ggplot()+
+  aes(x = Q, y = P)+
+  geom_line()+
+  theme_bw()+
+  geom_hline(yintercept = c(6,11), linetype = "dashed", color = c("red","blue"))+
+  geom_vline(xintercept = c(94,89), linetype = "dashed", color = c("red","blue"))+
+  scale_y_continuous(breaks = c(0,6,11,50,75,100))+
+  scale_x_continuous(breaks = c(100,94,89,50,25,0))+
+  ggtitle(label = "Problem 5",subtitle = "Sections: a, b and c")+
+  annotate(geom = "segment",x = 89,y = 11,xend = 94,yend = 11,color = "darkgreen", size = 2)+
+  annotate(geom = "segment",x = 89,y = 11,xend = 94,yend = 6,color = "darkgreen", size = 2)+
+  annotate(geom = "segment",x = 94,y = 11,xend = 94,yend = 6,color = "darkgreen", size = 2)
+
+```  
+
+## Private Efficiency     
+   
+Privately efficient quantity = 94  
+   
+## Social Efficiency      
+
+Since the cost curves are different between Jay and the public, there is inefficiency in the system which results in the social loss. The value of the social loss is the area of the triangle shown in the image which is equal to 5 * 5 / 2 = 12.5   
+
+## Socially Efficient quantity   
+
+Socially efficient quantity = 89   
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="the green triangle represents the social loss"}
+df4 = data.frame(Q = seq(0,100)) %>% 
+  mutate(P = 100 - Q)
+
+df4 %>% 
+  ggplot()+
+  aes(x = Q, y = P)+
+  geom_line()+
+  theme_bw()+
+  geom_hline(yintercept = c(1,6), linetype = "dashed", color = c("red","blue"))+
+  geom_vline(xintercept = c(99,94), linetype = "dashed", color = c("red","blue"))+
+  scale_y_continuous(breaks = c(1,6,50,75,100))+
+  scale_x_continuous(breaks = c(99,94,50,25,0))+
+  ggtitle(label = "Problem 5",subtitle = "Section-d")+
+  annotate(geom = "segment",x = 94,y = 6,xend = 99,yend = 6,color = "darkgreen", size = 2)+
+  annotate(geom = "segment",x = 94,y = 6,xend = 99,yend = 1,color = "darkgreen", size = 2)+
+  annotate(geom = "segment",x = 99,y = 6,xend = 99,yend = 1,color = "darkgreen", size = 2)
+
+``` 
+
+## $1 a pack  
+
+The total social value loss remains unchanged due to this price change because the area of the triangle shifts but doesnt change in size. So the social loss value remains at about the same 12.5 square units measure.   
+
+## Pigouvian solution:   
+
+Tax or Subsidy: *TAX*. Since the externality is negative, taxation helps to make the private curve equal to the social curve. Hence a tax of \$5 per pack should bring the social benefits and the private benefits the same.   
+
+## Coase Theroem   
+
+1. The property rights are assigned such that the individual's right to smoke is his decision and that it shouldn't factor in his neighbors right or health.   
+
+2. The Coase theorem may not work in this setting because there is no bargaining of health costs between the smoker and his neighbor. So it is not possible to obtain a pareto efficiency.   
 
